@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt'
 import express, { Request, Response } from 'express'
 import { Pool } from 'pg'
 import { config } from 'dotenv'
+import { v7 as uuid, v7 } from 'uuid'
 
 config(); 
 
@@ -20,21 +21,23 @@ app.use(express.urlencoded({ extended: true }));
 interface User {
     username: string;
     password: string;
+    dateOfBirth: string;
 }
 
 app.post('/signup', async (req: Request, res: Response) => {
-    const { username, password }: User = req.body;
-    if (!username || !password) {
-        return res.status(400).send("Username and password are required");
+    const { username, password, dateOfBirth}: User = req.body;
+    if (!username || !password || !dateOfBirth) {
+        return res.status(400).send("All fields are required");
     }
 
     const hash = await bcrypt.hash(password, 13);
+    const id = v7();
 
     try {
         console.log("Попытка добавления пользователя:", username);
         const result = await pool.query(
-            "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *",
-            [username, hash]
+            "INSERT INTO users (id, username, password, date_of_birth, created_at) VALUES ($1, $2, $3, $4::DATE, NOW()) RETURNING *",
+            [id, username, hash, dateOfBirth]
         );
         console.log("Пользователь успешно добавлен:", result.rows[0]);
         res.json({ message: 'ok' });
@@ -43,7 +46,6 @@ app.post('/signup', async (req: Request, res: Response) => {
         res.status(500).send("Error registering user");
     }
 });
-
 
 app.post('/login', async (req: Request, res: Response) => {
     const { username, password }: User = req.body;
@@ -61,7 +63,7 @@ app.post('/login', async (req: Request, res: Response) => {
             return res.status(401).send("Wrong password");
         }
 
-        res.json({ message: 'ok' });
+        res.json({ message: 'ok', id: user.id, username: user.username, dateOfBirth: user.date_of_birth, createdAt: user.created_at });
     } catch (err) {
         console.error("Ошибка при логине:", err);
         res.status(500).send("Error logging in");

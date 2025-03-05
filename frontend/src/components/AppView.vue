@@ -6,7 +6,7 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import Chat from "./Chat.vue";
 import ChatList from "./ChatList.vue";
 import Navigation from "./Navigation.vue";

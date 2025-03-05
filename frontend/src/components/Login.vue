@@ -30,11 +30,15 @@
 </template>
 
 <script setup>
+import { useAuthStore } from "@/store/authStore";
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 const username = ref("");
 const password = ref("");
 const response = ref(null);
+
+const router = useRouter();
 
 const submitForm = async () => {
   const payload = {
@@ -57,6 +61,12 @@ const submitForm = async () => {
 
     const data = await res.json();
     response.value = data;
+
+    if (data.message === "ok") {
+      const authStore = useAuthStore();
+      authStore.login(data);
+      router.push("/chats");
+    }
   } catch (error) {
     console.error("Error:", error);
     response.value = { error: error.message };

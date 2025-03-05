@@ -1,68 +1,75 @@
 <template>
-    <div class="container">
-        <div class="left-container">
-            <span><i class='bx bx-dots-vertical'></i></span>
-            <div class="search-container">
-                <i class="bx bx-search search-icon"></i>
-                <input type="text" class="search-input" placeholder="Search contacts and messages...">
-            </div>
-        </div>
-        <div class="right-container">
-            <span><i class='bx bxs-bell'></i></span>
-            <img src="/avatar.png">
-            <span><i class='bx bx-chevron-down'></i></span>
-        </div>
-        
+  <div class="container">
+    <div class="left-container">
+      <span><i class="bx bx-dots-vertical"></i></span>
+      <div class="search-container">
+        <i class="bx bx-search search-icon"></i>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search contacts and messages..."
+        />
+      </div>
     </div>
+    <div class="right-container">
+      <span><i class="bx bxs-bell"></i></span>
+      <img src="/avatar.png" />
+      <span><i class="bx bx-chevron-down"></i></span>
+      <span @click="logout"><i class="bx bxs-exit"></i></span>
+    </div>
+  </div>
 </template>
 
-<script>
-export default {
-    setup () {
-        
+<script setup>
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/store/authStore";
 
-        return {}
-    }
-}
+const router = useRouter();
+const authStore = useAuthStore();
+
+const logout = () => {
+  authStore.logout();
+  router.push("/login");
+};
 </script>
 
 <style>
 .container {
-    background-color: #2c3a57;
-    width: 100%;
-    height: 60px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+  background-color: #2c3a57;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .left-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 20px;
-    padding-left: 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  padding-left: 20px;
 
-    font-size: 20px;
-    color: #d1dbee;
+  font-size: 20px;
+  color: #d1dbee;
 }
 
 .right-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 16px;
-    padding-right: 20px;
-    font-size: 18px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  padding-right: 20px;
+  font-size: 18px;
 
-    color: #d1dbee;
+  color: #d1dbee;
 }
 
 .right-container > img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
 }
 
 .search-container {
@@ -84,7 +91,7 @@ export default {
 }
 
 .search-input::placeholder {
-    color: #cccccc;
+  color: #cccccc;
 }
 
 .search-icon {
@@ -96,7 +103,4 @@ export default {
   color: #cccccc;
   cursor: pointer;
 }
-
-
-
 </style>

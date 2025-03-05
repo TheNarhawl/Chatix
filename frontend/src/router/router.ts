@@ -16,7 +16,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: false },
   },
   {
-    path: "/chat",
+    path: "/chats",
     component: AppView,
     meta: { requiresAuth: true },
   },
@@ -33,7 +33,7 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next("/login");
   } else if (to.path === "/login" && authStore.isAuthenticated) {
-    next("/chat");
+    next("/chats");
   } else {
     next();
   }

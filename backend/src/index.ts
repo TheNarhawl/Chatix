@@ -341,7 +341,7 @@ app.put('/chat/edit-message', async (req: Request, res: Response) => {
 });
 
 app.get('/user/get-chats', async (req: Request, res: Response) => {
-  const { userId }: GetUserChatsRequest = req.body;
+  const { userId } = req.query;
 
   console.log('req.query:', req.query);
 
@@ -362,9 +362,10 @@ app.get('/user/get-chats', async (req: Request, res: Response) => {
     const chats = await chatRepository
       .createQueryBuilder('chat')
       .innerJoin('chat.users', 'user', 'user.id = :userId', { userId })
+      .leftJoinAndSelect('chat.users', 'users') // Загружаем всех участников чата
       .getMany();
 
-    const chatsWithLastMessage = await Promise.all(
+    const chatsWithLastMessageAndPartner = await Promise.all(
       chats.map(async (chat) => {
         const lastMessage = await messageRepository
           .createQueryBuilder('message')
@@ -380,6 +381,11 @@ app.get('/user/get-chats', async (req: Request, res: Response) => {
           ])
           .getOne();
 
+        let partner = null;
+        if (chat.type === 'dm') {
+          partner = chat.users.find((u) => u.id !== userId);
+        }
+
         return {
           id: chat.id,
           type: chat.type,
@@ -394,13 +400,16 @@ app.get('/user/get-chats', async (req: Request, res: Response) => {
                 },
               }
             : null,
+          partner: partner
+            ? { id: partner.id, username: partner.username }
+            : null,
         };
       })
     );
 
     res.json({
-      message: 'Чаты пользователя получены',
-      chats: chatsWithLastMessage,
+      message: 'ok',
+      chats: chatsWithLastMessageAndPartner,
     });
   } catch (err) {
     console.error('Ошибка при получении чатов пользователя:', err);

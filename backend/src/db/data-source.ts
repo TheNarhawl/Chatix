@@ -5,9 +5,7 @@ import { Message } from '../entities/messages';
 import { config } from 'dotenv';
 config();
 
-console.log(process.env.DB_HOST)
-
-const AppDataSource = new DataSource({
+export const AppDataSource = new DataSource({
     type: 'postgres',
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT),
@@ -20,5 +18,3 @@ const AppDataSource = new DataSource({
     migrations: ['src/db/migrations/**/*.ts'],
     subscribers: [],
 });
-
-module.exports = AppDataSource;

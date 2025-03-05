@@ -3,6 +3,8 @@ import express, { Request, Response } from 'express'
 import { Pool } from 'pg'
 import { config } from 'dotenv'
 import { v7 as uuid, v7 } from 'uuid'
+import { AppDataSource } from './db/data-source';
+import { User } from './entities/users'
 
 config(); 
 
@@ -18,37 +20,61 @@ const app = express()
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-interface User {
+const initializeDatabase = async () => {
+    try {
+        await AppDataSource.initialize();
+        console.log('Database connected');
+    } catch (err) {
+        console.error('Database connection failed', err);
+        process.exit(1);
+    }
+};
+
+initializeDatabase();
+
+interface UserSignupRequest {
     username: string;
     password: string;
     dateOfBirth: string;
 }
 
+interface UserLoginRequest {
+    username: string;
+    password: string;
+}
+
 app.post('/signup', async (req: Request, res: Response) => {
-    const { username, password, dateOfBirth}: User = req.body;
+    const { username, password, dateOfBirth}: UserSignupRequest = req.body;
     if (!username || !password || !dateOfBirth) {
         return res.status(400).send("All fields are required");
     }
 
-    const hash = await bcrypt.hash(password, 13);
-    const id = v7();
-
     try {
-        console.log("Попытка добавления пользователя:", username);
-        const result = await pool.query(
-            "INSERT INTO users (id, username, password, date_of_birth, created_at) VALUES ($1, $2, $3, $4::DATE, NOW()) RETURNING *",
-            [id, username, hash, dateOfBirth]
-        );
-        console.log("Пользователь успешно добавлен:", result.rows[0]);
+        const hash = await bcrypt.hash(password, 13);
+        const dateOfBirthDate = new Date(dateOfBirth);
+        if (isNaN(dateOfBirthDate.getTime())) {
+            return res.status(400).send('Invalid date format');
+        }
+
+        const userRepository = AppDataSource.getRepository(User);
+        const user = new User();
+        user.id = uuid();
+        user.username = username;
+        user.password = hash;
+        user.dateOfBirth = dateOfBirthDate;
+
+        await userRepository.save(user);
+
+        console.log('User successfully registered:', user);
         res.json({ message: 'ok' });
     } catch (err) {
-        console.error("Ошибка при добавлении в БД:", err);
-        res.status(500).send("Error registering user");
+        console.error('Error during registration:', err);
+        res.status(500).send('Error registering user');
     }
 });
 
 app.post('/login', async (req: Request, res: Response) => {
-    const { username, password }: User = req.body;
+    const { username, password }: UserLoginRequest = req.body;
     
     try {
         const result = await pool.query("SELECT * FROM users WHERE username = $1", [username]);

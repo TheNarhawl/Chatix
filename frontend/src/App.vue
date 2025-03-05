@@ -1,26 +1,14 @@
 <template>
-  <!-- <AppNavigation></AppNavigation> -->
-  <routerView></routerView>
-  <div class="dialogs-wrapper">
-    <!-- <Dialogs></Dialogs>
-      <OpenedDialog></OpenedDialog> -->
-  </div>
+  <RouterView></RouterView>
 </template>
 
 <script>
-import Navigation from "./components/Navigation.vue";
-import ChatList from "./components/ChatList.vue";
-import Chat from "./components/Chat.vue";
-import Login from "./components/Login.vue";
 import { RouterView } from "vue-router";
 
 export default {
   name: "App",
   components: {
-    Navigation,
-    ChatList,
-    Chat,
-    Login,
+    RouterView
   },
 };
 </script>
@@ -55,8 +43,4 @@ body {
   padding: 0;
 }
 
-.dialogs-wrapper {
-  display: flex;
-  flex-direction: row;
-}
 </style>

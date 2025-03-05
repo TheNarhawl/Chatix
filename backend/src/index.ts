@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import express, { Request, Response } from 'express';
+const cors = require('cors');
 import { Pool } from 'pg';
 import { config } from 'dotenv';
 import { v7 as uuid, v7 } from 'uuid';
@@ -20,6 +21,7 @@ const pool = new Pool({
 });
 
 const app = express();
+app.use(cors({ origin: 'http://localhost:8081' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -470,6 +472,6 @@ app.get('/chat/get-messages', async (req: Request, res: Response) => {
 });
 
 const port = process.env.BACKEND_PORT;
-app.listen(port, () => console.log('listening on port 8080'));
+app.listen(port, () => console.log('listening on port 3000'));
 
 // export = app

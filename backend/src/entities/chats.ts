@@ -1,13 +1,13 @@
-import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryColumn } from "typeorm";
 import { v7 } from "uuid";
 import { ChatType } from "./enums";
 import { Message } from "./messages";
-import { ChatUser } from "./chats_users";
+import { User } from "./users";
 
 @Entity()
 export class Chat {
-    @PrimaryColumn({ type: 'uuid', default: () => v7() })
-    id: string;
+    @PrimaryColumn({ type: 'uuid'})
+    id: string = v7();
 
     @Column({ type: 'timestamp'})
     createdAt: Date;
@@ -25,7 +25,8 @@ export class Chat {
     @OneToMany(() => Message, message => message.chat)
     messages: Message[];
 
-    @OneToMany(() => ChatUser, chatUser => chatUser.chat)
-    chatUsers: ChatUser[];
+    @ManyToMany(() => User, user => user.chats)
+    @JoinTable()
+    users: User[];
 
 }

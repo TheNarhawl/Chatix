@@ -5,13 +5,13 @@ import { User } from './users';
 
 @Entity()
 export class Message {
-    @PrimaryColumn({ type: 'uuid', default: () => v7() })
-    id: string;
+    @PrimaryColumn({ type: 'uuid'})
+    id: string = v7();
 
-    @Column({ type: 'varchar', length: 36})
+    @Column({ type: 'uuid'})
     chatId: string;
 
-    @Column({ type: 'varchar', length: 36})
+    @Column({ type: 'uuid'})
     senderId: string;
 
     @Column({ type: 'text'})

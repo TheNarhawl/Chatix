@@ -21,12 +21,12 @@
     "express": "^4.21.2",
     "nodemon": "^3.1.9",
     "pg": "^8.13.3",
-    "ts-node": "^10.9.2",
     "typeorm": "^0.3.21",
-    "typescript": "^5.8.2",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@types/node": "^22.13.9"
+    "@types/node": "^22.13.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
   }
 }

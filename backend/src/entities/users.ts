@@ -1,12 +1,12 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToMany, OneToMany, PrimaryColumn } from "typeorm";
 import { v7 } from "uuid";
 import { Message } from "./messages";
-import { ChatUser } from "./chats_users";
+import { Chat } from "./chats";
 
 @Entity()
 export class User {
-    @PrimaryColumn({ type: 'uuid', default: () => v7() })
-    id: string;
+    @PrimaryColumn({ type: 'uuid'})
+    id: string = v7();
 
     @Column({unique: true, type: "varchar", length: 50})
     username: string;
@@ -29,8 +29,8 @@ export class User {
     @OneToMany(() => Message, message => message.sender)
     messages: Message[];
 
-    @OneToMany(() => ChatUser, chatUser => chatUser.user)
-    chatUsers: ChatUser[];
+    @ManyToMany(() => Chat, chat => chat.users)
+    chats: Chat[];
 
     // constructor() {
     //     this.id = v7();

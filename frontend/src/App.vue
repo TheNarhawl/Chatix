@@ -1,33 +1,33 @@
 <template>
   <!-- <AppNavigation></AppNavigation> -->
-  <Login></Login>
+  <routerView></routerView>
   <div class="dialogs-wrapper">
-      <!-- <Dialogs></Dialogs>
+    <!-- <Dialogs></Dialogs>
       <OpenedDialog></OpenedDialog> -->
-    </div>
-  
+  </div>
 </template>
 
 <script>
-import Navigation from './components/Navigation.vue';
-import ChatList from './components/ChatList.vue';
-import Chat from './components/Chat.vue';
-import Login from './components/Login.vue';
-
+import Navigation from "./components/Navigation.vue";
+import ChatList from "./components/ChatList.vue";
+import Chat from "./components/Chat.vue";
+import Login from "./components/Login.vue";
+import { RouterView } from "vue-router";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     Navigation,
     ChatList,
     Chat,
-    Login
-  }
-}
+    Login,
+  },
+};
 </script>
 
 <style>
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   overflow: hidden;
@@ -59,5 +59,4 @@ html, body {
   display: flex;
   flex-direction: row;
 }
-
 </style>

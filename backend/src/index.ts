@@ -80,6 +80,10 @@ interface GetUserChatsRequest {
   userId: string;
 }
 
+interface GetChatMessages {
+  chatId: string;
+}
+
 app.post('/user/signup', async (req: Request, res: Response) => {
   const { username, password, dateOfBirth }: UserSignupRequest = req.body;
   if (!username || !password || !dateOfBirth) {
@@ -399,6 +403,69 @@ app.get('/user/get-chats', async (req: Request, res: Response) => {
   } catch (err) {
     console.error('Ошибка при получении чатов пользователя:', err);
     res.status(500).send('Error fetching user chats');
+  }
+});
+
+app.get('/chat/get-messages', async (req: Request, res: Response) => {
+  const { chatId }: GetChatMessages = req.body;
+
+  if (!chatId) {
+    return res.status(400).json({ error: 'Требуется chatId' });
+  }
+
+  try {
+    const chatRepository = AppDataSource.getRepository(Chat);
+    const messageRepository = AppDataSource.getRepository(Message);
+
+    const chat = await chatRepository.findOne({
+      where: { id: chatId },
+      relations: ['users'],
+    });
+
+    if (!chat) {
+      return res.status(404).json({ error: 'Чат не найден' });
+    }
+
+    const messages = await messageRepository
+      .createQueryBuilder('message')
+      .leftJoin('message.sender', 'sender')
+      .where('message.chatId = :chatId', { chatId })
+      .orderBy('message.timestamp', 'DESC')
+      .select([
+        'message.id',
+        'message.text',
+        'message.timestamp',
+        'sender.id',
+        'sender.username',
+        'sender.avatarURL',
+      ])
+      .getMany();
+
+    const users = chat.users.map((user) => ({
+      id: user.id,
+      username: user.username,
+      avatarURL: user.avatarURL,
+    }));
+
+    const response = {
+      chatId: chat.id,
+      type: chat.type,
+      users,
+      messages: messages.map((message) => ({
+        id: message.id,
+        text: message.text,
+        timestamp: message.timestamp,
+        sender: {
+          id: message.sender.id,
+          username: message.sender.username,
+        },
+      })),
+    };
+
+    res.json(response);
+  } catch (err) {
+    console.error('Ошибка при получении сообщений:', err);
+    res.status(500).send('Error fetching messages');
   }
 });
 

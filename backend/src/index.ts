@@ -57,6 +57,12 @@ app.post('/signup', async (req: Request, res: Response) => {
         }
 
         const userRepository = AppDataSource.getRepository(User);
+
+        const existingUser = await userRepository.findOneBy({ username });
+        if (existingUser) {
+            return res.status(409).send("User with this username already exists");
+        }
+
         const user = new User();
         user.id = uuid();
         user.username = username;
@@ -77,8 +83,8 @@ app.post('/login', async (req: Request, res: Response) => {
     const { username, password }: UserLoginRequest = req.body;
     
     try {
-        const result = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
-        const user = result.rows[0];
+        const userRepository = AppDataSource.getRepository(User);
+        const user = await userRepository.findOneBy({ username });
 
         if (!user) {
             return res.status(404).send("No such user");
@@ -89,7 +95,14 @@ app.post('/login', async (req: Request, res: Response) => {
             return res.status(401).send("Wrong password");
         }
 
-        res.json({ message: 'ok', id: user.id, username: user.username, dateOfBirth: user.date_of_birth, createdAt: user.created_at });
+        res.json({ 
+            message: 'ok', 
+            id: user.id, 
+            username: user.username, 
+            dateOfBirth: user.dateOfBirth, 
+            createdAt: user.createdAt 
+        });
+
     } catch (err) {
         console.error("Ошибка при логине:", err);
         res.status(500).send("Error logging in");

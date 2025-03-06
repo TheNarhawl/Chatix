@@ -89,21 +89,21 @@ interface GetChatMessages {
 app.post('/user/signup', async (req: Request, res: Response) => {
   const { username, password, dateOfBirth }: UserSignupRequest = req.body;
   if (!username || !password || !dateOfBirth) {
-    return res.status(400).send('All fields are required');
+    return res.status(400).json({ message: 'All fields are required' });
   }
 
   try {
     const hash = await bcrypt.hash(password, 13);
     const dateOfBirthDate = new Date(dateOfBirth);
     if (isNaN(dateOfBirthDate.getTime())) {
-      return res.status(400).send('Invalid date format');
+      return res.status(400).json({ message: 'Invalid date format' });
     }
 
     const userRepository = AppDataSource.getRepository(User);
 
     const existingUser = await userRepository.findOneBy({ username });
     if (existingUser) {
-      return res.status(409).send('User with this username already exists');
+      return res.status(409).json({ message: 'User with this username already exists' });
     }
 
     const user = new User();

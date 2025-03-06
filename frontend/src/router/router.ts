@@ -1,4 +1,5 @@
 import Login from "@/components/Login.vue";
+import Signup from "@/components/Signup.vue";
 import AppView from "@/components/AppView.vue";
 import { useAuthStore } from "@/store/authStore";
 import { createWebHistory } from "vue-router";
@@ -13,6 +14,11 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/login",
     component: Login,
+    meta: { requiresAuth: false },
+  },
+  {
+    path: "/signup",
+    component: Signup,
     meta: { requiresAuth: false },
   },
   {

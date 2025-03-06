@@ -4,14 +4,19 @@
       <h2>Welcome to Chatix!</h2>
       <form @submit.prevent="submitForm">
         <div class="input-group">
+          <i class="bx bx-user"></i>
           <input type="text" v-model="username" placeholder="Username" />
         </div>
 
         <div class="input-group">
+          <i class="bx bxs-lock"></i>
           <input type="password" v-model="password" placeholder="Password" />
         </div>
 
         <button type="submit" class="login-button">Login</button>
+        <button @click="goToSignUp" type="button" class="signup-button">
+          Sign up
+        </button>
       </form>
 
       <div v-if="response" class="response">
@@ -72,13 +77,17 @@ const submitForm = async () => {
     response.value = { error: error.message };
   }
 };
+
+const goToSignUp = () => {
+  router.push("/signup");
+};
 </script>
 
 <style scoped>
 .login-container {
   width: 100%;
   height: 100vh;
-  background-color: rgb(75, 104, 104);
+  background-color: rgb(152, 153, 155);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -87,7 +96,7 @@ const submitForm = async () => {
 .login-wrapper {
   background: white;
   padding: 2rem;
-  border-radius: 8px;
+  border-radius: 16px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 400px;
@@ -100,14 +109,25 @@ h2 {
 }
 
 .input-group {
+  position: relative;
   margin-bottom: 1rem;
+}
+
+.input-group i {
+  position: absolute;
+  left: 1rem;
+  top: 48%;
+  transform: translateY(-50%);
+  color: #888;
+  font-size: 18px;
 }
 
 input {
   width: 100%;
   padding: 0.75rem;
+  padding-left: 2.5rem;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 20px;
   font-size: 1rem;
 }
 
@@ -122,7 +142,19 @@ input:focus {
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 16px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.signup-button {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  background-color: #b4b9be;
+  color: rgb(0, 0, 0);
+  border: none;
+  border-radius: 16px;
   font-size: 1rem;
   cursor: pointer;
 }

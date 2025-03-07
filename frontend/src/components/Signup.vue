@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <div class="login-wrapper">
-      <h2 v-if="!isSuccess">Create a new Chatix account</h2>
+      <h2 v-if="!isSuccess">{{ displayedHeaderText }}</h2>
 
       <div v-if="isSuccess" class="success-message">
         <h2>Account successfully created!</h2>
@@ -66,7 +66,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
 const username = ref("");
@@ -155,13 +155,29 @@ const submitForm = async () => {
 const goToLogin = () => {
   router.push("/login");
 };
+
+const headerText = "Create a new Chatix account";
+const displayedHeaderText = ref("");
+const speed = 50;
+
+onMounted(() => {
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i < headerText.length) {
+      displayedHeaderText.value += headerText[i];
+      i++;
+    } else {
+      clearInterval(interval);
+    }
+  }, speed);
+});
 </script>
 
 <style scoped>
 .login-container {
   width: 100%;
   height: 100vh;
-  background-color: #bfd1ff;
+  background-color: rgb(227, 227, 227);
   display: flex;
   position: relative;
   justify-content: center;
@@ -171,10 +187,11 @@ const goToLogin = () => {
 
 .login-wrapper {
   z-index: 1;
-  background: rgba(255, 255, 255, 1);
+  background: rgba(220, 220, 220, 0.4);
   padding: 2rem;
   border-radius: 16px;
-  box-shadow: 0px 0px 28px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 420px;
 }
@@ -183,6 +200,9 @@ h2 {
   text-align: center;
   margin-bottom: 1.5rem;
   color: #333;
+  font-family: monospace;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .input-group {

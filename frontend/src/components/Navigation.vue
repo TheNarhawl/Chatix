@@ -1,7 +1,9 @@
 <template>
   <div class="container">
     <div class="left-container">
-      <span><i class="bx bx-dots-vertical"></i></span>
+      <span @click="emit('toggle-chat-list')"
+        ><i class="bx bx-dots-vertical"></i
+      ></span>
       <div class="search-container">
         <i class="bx bx-search search-icon"></i>
         <input
@@ -14,18 +16,57 @@
     <div class="right-container">
       <span><i class="bx bxs-bell"></i></span>
       <img src="/avatar.png" />
-      <span><i class="bx bx-chevron-down"></i></span>
-      <span @click="logout"><i class="bx bxs-exit"></i></span>
+      <span @mouseenter="showAdditional" @mouseleave="startHideTimeout"
+        ><i class="bx bxs-cog"></i
+      ></span>
+      <!-- <span @click="logout"><i class="bx bxs-exit"></i></span> -->
     </div>
+    <transition name="dropdown">
+      <div
+        class="additional-wrapper"
+        v-if="isAdditionalVisible"
+        @mouseenter="clearHideTimeout"
+        @mouseleave="startHideTimeout"
+      >
+        <ul>
+          <li>Profile</li>
+          <li>Settings</li>
+          <li @click="logout" class="logout-button">
+            Logout <i class="bx bx-log-out"></i>
+          </li>
+        </ul>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup>
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/store/authStore";
+import { ref } from "vue";
 
 const router = useRouter();
 const authStore = useAuthStore();
+const emit = defineEmits(["toggle-chat-list"]);
+const isProfileVisible = ref(false);
+
+const isAdditionalVisible = ref(false);
+let hideTimeout = null;
+
+const showAdditional = () => {
+  clearTimeout(hideTimeout);
+  isAdditionalVisible.value = true;
+};
+
+const startHideTimeout = () => {
+  hideTimeout = setTimeout(() => {
+    isAdditionalVisible.value = false;
+  }, 300);
+};
+
+const clearHideTimeout = () => {
+  clearTimeout(hideTimeout);
+};
 
 const logout = () => {
   authStore.logout();
@@ -36,6 +77,7 @@ const logout = () => {
 <style>
 .container {
   background-color: #2c3a57;
+  z-index: 1;
   width: 100%;
   height: 60px;
   display: flex;
@@ -53,6 +95,17 @@ const logout = () => {
 
   font-size: 20px;
   color: #d1dbee;
+}
+
+.left-container > span,
+.right-container > span {
+  color: #d1dbee;
+  transition: 0.1s ease;
+}
+
+.left-container > span:hover,
+.right-container > span:hover {
+  color: rgb(170, 170, 170);
 }
 
 .right-container {
@@ -102,5 +155,66 @@ const logout = () => {
   transform: translateY(-50%);
   color: #cccccc;
   cursor: pointer;
+}
+
+.additional-wrapper {
+  position: absolute;
+  top: 7%;
+  right: 1%;
+  background: rgb(255, 255, 255);
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  padding: 10px;
+  min-width: 150px;
+  z-index: 10;
+}
+
+.additional-wrapper ul {
+  list-style: none;
+  text-align: left;
+  padding: 0;
+  margin: 0;
+}
+
+.additional-wrapper li {
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background ease 0.2s;
+}
+
+.additional-wrapper li:hover {
+  background: #f0f0f0;
+}
+
+.logout-button {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  color: red;
+}
+
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.dropdown-enter-from {
+  transform: translateY(-5px);
+  opacity: 0;
+}
+
+.dropdown-enter-to {
+  transform: translateY(0px);
+  opacity: 1;
+}
+
+.dropdown-leave-from {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.dropdown-leave-to {
+  opacity: 0;
 }
 </style>

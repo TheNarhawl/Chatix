@@ -181,7 +181,7 @@ watch(
   cursor: pointer;
   display: flex;
   flex-direction: row;
-  gap: 8px;
+  gap: 16px;
 }
 
 .btns-container > p {

@@ -1,15 +1,28 @@
 <template>
-  <Navigation></Navigation>
+  <Navigation @toggle-chat-list="toggleChatList"></Navigation>
   <div class="dialogs-wrapper">
-    <ChatList></ChatList>
+    <transition name="fade">
+      <ChatList v-if="isChatListVisible"></ChatList>
+    </transition>
     <Chat></Chat>
   </div>
 </template>
 
 <script setup>
+import { onMounted, ref } from "vue";
 import Chat from "./Chat.vue";
 import ChatList from "./ChatList.vue";
 import Navigation from "./Navigation.vue";
+
+const isChatListVisible = ref(true);
+
+const toggleChatList = () => {
+  isChatListVisible.value = !isChatListVisible.value;
+};
+
+onMounted(() => {
+  document.title = "Chatix";
+});
 </script>
 
 <style scoped>
@@ -17,4 +30,12 @@ import Navigation from "./Navigation.vue";
   display: flex;
   flex-direction: row;
 }
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: 0.2s ease;
+}
+/* .fade-enter-from,
+.fade-leave-to {
+} */
 </style>

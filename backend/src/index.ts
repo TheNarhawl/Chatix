@@ -9,6 +9,18 @@ import { User } from './entities/users';
 import { Chat } from './entities/chats';
 import { ChatType } from './entities/enums';
 import { Message } from './entities/messages';
+import {
+  UserDeleteRequest,
+  UserLoginRequest,
+  UserSignupRequest,
+  UserUpdateBioRequest,
+} from './types/user';
+import { CreateChatDM, GetChatMessages } from './types/chat';
+import {
+  DeleteMessageRequest,
+  EditMessageRequest,
+  SendMessageRequest,
+} from './types/message';
 
 config();
 
@@ -37,55 +49,6 @@ const initializeDatabase = async () => {
 
 initializeDatabase();
 
-interface UserSignupRequest {
-  username: string;
-  password: string;
-  dateOfBirth: string;
-}
-
-interface UserLoginRequest {
-  username: string;
-  password: string;
-}
-
-interface UserDeleteRequest {
-  username: string;
-  password: string;
-}
-
-interface UserUpdateBioRequest {
-  username: string;
-  bio: string;
-}
-
-interface CreateChatDM {
-  senderUsername: string;
-  getterUsername: string;
-}
-
-interface SendMessageRequest {
-  chatId: string;
-  senderId: string;
-  text: string;
-}
-
-interface DeleteMessageRequest {
-  messageId: string;
-}
-
-interface EditMessageRequest {
-  messageId: string;
-  text: string;
-}
-
-interface GetUserChatsRequest {
-  userId: string;
-}
-
-interface GetChatMessages {
-  chatId: string;
-}
-
 app.post('/user/signup', async (req: Request, res: Response) => {
   const { username, password, dateOfBirth }: UserSignupRequest = req.body;
   if (!username || !password || !dateOfBirth) {
@@ -103,7 +66,9 @@ app.post('/user/signup', async (req: Request, res: Response) => {
 
     const existingUser = await userRepository.findOneBy({ username });
     if (existingUser) {
-      return res.status(409).json({ message: 'User with this username already exists' });
+      return res
+        .status(409)
+        .json({ message: 'User with this username already exists' });
     }
 
     const user = new User();
@@ -229,7 +194,7 @@ app.post('/chat/create-dm', async (req: Request, res: Response) => {
       .innerJoin('chat.users', 'user2', 'user2.username = :getterUsername', {
         getterUsername,
       })
-      .where('chat.type = :type', { type: ChatType.DM }) // Убедитесь, что это DM-чат
+      .where('chat.type = :type', { type: ChatType.DM })
       .getOne();
 
     if (existingChat) {
@@ -362,7 +327,7 @@ app.get('/user/get-chats', async (req: Request, res: Response) => {
     const chats = await chatRepository
       .createQueryBuilder('chat')
       .innerJoin('chat.users', 'user', 'user.id = :userId', { userId })
-      .leftJoinAndSelect('chat.users', 'users') // Загружаем всех участников чата
+      .leftJoinAndSelect('chat.users', 'users')
       .getMany();
 
     const chatsWithLastMessageAndPartner = await Promise.all(

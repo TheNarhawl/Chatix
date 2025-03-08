@@ -11,6 +11,7 @@ import { ChatType } from './entities/enums';
 import { Message } from './entities/messages';
 import {
   UserDeleteRequest,
+  UserInfoRequest,
   UserLoginRequest,
   UserSignupRequest,
   UserUpdateBioRequest,
@@ -164,6 +165,44 @@ app.put('/user/update-bio', async (req: Request, res: Response) => {
   } catch (err) {
     console.error('Ошибка при обновлении bio:', err);
     res.status(500).send('Error updating bio');
+  }
+});
+
+app.get('/user/get-info', async (req: Request, res: Response) => {
+
+  console.log('Request Query:', req.query);
+  const { userId } = req.query;
+
+  console.log(userId);
+
+  if (!userId || typeof userId !== 'string') {
+    return res.status(404).send('User not found');
+  }
+
+  try {
+    const userRepository = AppDataSource.getRepository(User);
+
+    const user = await userRepository.findOneBy({ id: userId });
+    if (!user) {
+      return res.status(404).json({ error: 'Пользователь не найден' });
+    }
+
+    const { dateOfBirth, createdAt, username, id, avatarURL, bio } = user;
+
+    res.json({
+      message: 'ok',
+      data: {
+        dateOfBirth,
+        createdAt,
+        username,
+        id,
+        avatarURL,
+        bio,
+      },
+    });
+  } catch (err) {
+    console.error('Ошибка при получении информации о пользователе', err);
+    res.status(500).send('Error sending message');
   }
 });
 

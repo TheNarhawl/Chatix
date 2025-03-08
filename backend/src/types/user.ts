@@ -18,3 +18,7 @@ export interface UserUpdateBioRequest {
   username: string;
   bio: string;
 }
+
+export interface UserInfoRequest {
+  userId: string;
+}

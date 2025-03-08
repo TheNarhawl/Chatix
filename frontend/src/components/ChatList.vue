@@ -80,6 +80,7 @@ const tabs = ["Recent", "Contacts", "Groups"];
 
 const userId = authStore.user?.id;
 
+
 const fetchChats = async () => {
   if (!userId) {
     console.error("User ID is not available.");

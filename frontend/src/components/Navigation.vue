@@ -29,7 +29,7 @@
         @mouseleave="startHideTimeout"
       >
         <ul>
-          <li>Profile</li>
+          <li @click="isProfileOpen = true">Profile</li>
           <li>Settings</li>
           <li @click="logout" class="logout-button">
             Logout <i class="bx bx-log-out"></i>
@@ -38,9 +38,11 @@
       </div>
     </transition>
   </div>
+  <Profile @close-profile="isProfileOpen = false" />
 </template>
 
 <script setup>
+import Profile from "./Profile.vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/store/authStore";
 import { ref } from "vue";
@@ -51,6 +53,8 @@ const emit = defineEmits(["toggle-chat-list"]);
 const isProfileVisible = ref(false);
 
 const isAdditionalVisible = ref(false);
+const isProfileOpen = ref(false);
+
 let hideTimeout = null;
 
 const showAdditional = () => {

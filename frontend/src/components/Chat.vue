@@ -3,26 +3,24 @@
     <div v-if="!chatData" class="wrapper">
       <p>Welcome to Chatix!</p>
     </div>
-    <div v-else class="dialog-info">
+    <div v-else class="dialog">
       <div class="user-info">
-        <img src="no-avatar.png" alt="User Avatar" class="avatar" />
         <div class="user-wrapper">
+          <img
+            :src="interlocutor.avatarURL || 'no-avatar.jpg'"
+            alt="User Avatar"
+            class="avatar"
+          />
           <p>{{ interlocutor.username }}</p>
-          <!-- <span
-            class="status"
-            :class="{ online: user.isOnline, offline: !user.isOnline }"
-          >
-            {{ user.isOnline ? "В сети" : "Не в сети" }}
-          </span> -->
+        </div>
+        <div class="actions">
+          <span><i class="bx bx-search-alt-2"></i></span>
+          <span><i class="bx bx-user-plus"></i></span>
+          <span><i class="bx bx-dots-vertical"></i></span>
         </div>
       </div>
-      <div class="actions">
-        <span><i class="bx bx-search-alt-2"></i></span>
-        <span><i class="bx bx-user-plus"></i></span>
-        <span><i class="bx bx-dots-vertical"></i></span>
-      </div>
 
-      <div class="chat-window">
+      <div class="chat-window" ref="chatContainer">
         <ul class="message-list">
           <li
             v-for="(message, index) in chatData.messages"
@@ -34,7 +32,11 @@
           >
             <!-- Аватарка и имя собеседника -->
             <div v-if="message.sender.id !== userId" class="message-info">
-              <img :src="interlocutor.avatarURL" alt="Avatar" class="avatar" />
+              <img
+                :src="interlocutor.avatarURL || 'no-avatar.jpg'"
+                alt="Avatar"
+                class="message-avatar"
+              />
               <span class="username">{{ interlocutor.username }}</span>
               <span class="message-time">{{
                 formatTimestamp(message.timestamp)
@@ -71,7 +73,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, watch, computed } from "vue";
+import { ref, defineProps, watch, computed, nextTick } from "vue";
 import { useAuthStore } from "@/store/authStore";
 const authStore = useAuthStore();
 
@@ -84,11 +86,11 @@ const props = defineProps({
 
 const localChatId = ref(props.chatId);
 const chatData = ref(null);
-const userId = computed(() => authStore.userId);
+const userId = authStore.user?.id;
 
 const interlocutor = computed(() => {
   if (!chatData.value) return null;
-  return chatData.value.users.find((user) => user.id !== userId.value);
+  return chatData.value.users.find((user) => user.id !== userId);
 });
 
 const fetchChatData = async (chatId) => {
@@ -107,10 +109,52 @@ const fetchChatData = async (chatId) => {
 
     const data = await response.json();
     chatData.value = data;
-    console.log("Chat data:", data);
+    await nextTick();
+    scrollToBottom();
   } catch (error) {
     console.error("Error fetching chat messages:", error);
     chatData.value = null;
+  }
+};
+
+const newMessage = ref("");
+
+async function sendMessage() {
+  if (!newMessage.value.trim()) {
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:3000/chat/send-message", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        chatId: localChatId.value,
+        senderId: userId,
+        text: newMessage.value,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Ошибка при отправке сообщения");
+    }
+
+    newMessage.value = "";
+
+    fetchChatData(localChatId.value);
+    await nextTick();
+    scrollToBottom();
+  } catch (error) {
+    console.error("Ошибка:", error);
+  }
+}
+
+const chatContainer = ref(null);
+const scrollToBottom = () => {
+  if (chatContainer.value) {
+    chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
   }
 };
 
@@ -130,7 +174,7 @@ watch(
 
 const formatTimestamp = (timestamp) => {
   const date = new Date(timestamp);
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 };
 </script>
 
@@ -153,34 +197,39 @@ const formatTimestamp = (timestamp) => {
   color: #d5d5d5;
 }
 
-.dialog-info {
+.dialog {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
   width: 100%;
-  padding: 10px;
   background-color: #f0f0f0;
   border-bottom: 1px solid #ccc;
 }
 
 .user-info {
+  width: 100%;
+  height: 60px;
   display: flex;
+  flex-direction: row;
   align-items: center;
-}
-
-.avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  margin-right: 10px;
+  justify-content: space-between;
+  padding: 0 20px;
 }
 
 .user-wrapper {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  flex-grow: 1;
 }
 
-.status {
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* .status {
   font-size: 14px;
   color: #666;
 }
@@ -191,21 +240,26 @@ const formatTimestamp = (timestamp) => {
 
 .status.offline {
   color: red;
-}
+} */
 
 .actions {
   font-size: 20px;
   display: flex;
-  gap: 20px;
+  gap: 10px;
   color: #666;
+}
+
+.actions > span {
+  cursor: pointer;
 }
 
 .chat-window {
   width: 100%;
-  flex: 1;
+  height: calc(100vh - 189px);
   padding: 10px;
   overflow-y: auto;
   background-color: white;
+  flex-direction: column;
 }
 
 .message-list {
@@ -213,7 +267,9 @@ const formatTimestamp = (timestamp) => {
   padding: 0;
   margin: 0;
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
+  flex-grow: 1;
+  justify-content: flex-end;
   gap: 15px;
 }
 
@@ -223,7 +279,6 @@ const formatTimestamp = (timestamp) => {
   flex-direction: column;
 }
 
-/* Сообщения пользователя (справа) */
 .user-message {
   align-self: flex-end;
   background-color: #3399ff;
@@ -232,23 +287,21 @@ const formatTimestamp = (timestamp) => {
   padding: 10px;
 }
 
-/* Сообщения собеседника (слева) */
 .other-message {
   align-self: flex-start;
-  background-color: #e0f2ff; /* Голубой цвет */
+  background-color: #e0f2ff;
   color: black;
   border-radius: 10px 10px 10px 0;
   padding: 10px;
 }
 
-/* Аватарка и имя собеседника */
 .message-info {
   display: flex;
   align-items: center;
   margin-bottom: 5px;
 }
 
-.avatar {
+.message-avatar {
   width: 30px;
   height: 30px;
   border-radius: 50%;
@@ -260,7 +313,6 @@ const formatTimestamp = (timestamp) => {
   font-size: 14px;
 }
 
-/* Контейнер для текста сообщения и времени */
 .other-message > .message-content {
   display: flex;
   flex-direction: column;
@@ -290,22 +342,22 @@ const formatTimestamp = (timestamp) => {
   padding: 10px;
   width: 100%;
   background-color: #f0f0f0;
-  border-top: 1px solid #ccc; /* Полоска сверху для разграничения */
+  border-top: 1px solid #ccc;
 }
 
 .message-input {
   flex: 1;
   padding: 10px;
-  border: none; /* Убираем обводку */
+  border: none;
   border-radius: 5px;
   margin-right: 10px;
-  background-color: transparent; /* Прозрачный фон */
-  outline: none; /* Убираем outline при фокусе */
-  font-size: 16px; /* Размер текста */
+  background-color: transparent;
+  outline: none;
+  font-size: 16px;
 }
 
 .message-input::placeholder {
-  color: #999; /* Цвет плейсхолдера */
+  color: #999;
 }
 
 .emoji-btn,

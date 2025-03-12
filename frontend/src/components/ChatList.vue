@@ -30,7 +30,9 @@
             <!-- <span :class="['status', dialog.status]"></span> -->
             <div class="dialog-info">
               <p class="nickname">{{ dialog.nickname }}</p>
-              <p class="message-preview">{{ dialog.messagePreview }}</p>
+              <p class="message-preview">
+                {{ truncateMessage(dialog.messagePreview) }}
+              </p>
             </div>
           </li>
         </ul>
@@ -81,14 +83,11 @@ const tabs = ["Recent", "Contacts", "Groups"];
 
 const userId = authStore.user?.id;
 
-const emit = defineEmits(['select-chat']);
+const emit = defineEmits(["select-chat"]);
 const selectChat = (chatId) => {
   console.log(chatId);
-  emit('select-chat', chatId);
-}
-
-
-
+  emit("select-chat", chatId);
+};
 
 const fetchChats = async () => {
   if (!userId) {
@@ -145,6 +144,11 @@ const groups = ref([
     membersCount: 24,
   },
 ]);
+
+const truncateMessage = (message, limit = 40) => {
+  if (message.length <= limit) return message;
+  return message.slice(0, limit) + "...";
+};
 
 const selectTab = (tab) => {
   selectedTab.value = tab;

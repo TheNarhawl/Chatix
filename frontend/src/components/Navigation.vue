@@ -105,6 +105,7 @@ const logout = () => {
 .right-container > span {
   color: #d1dbee;
   transition: 0.1s ease;
+  cursor: pointer;
 }
 
 .left-container > span:hover,

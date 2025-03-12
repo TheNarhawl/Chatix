@@ -38,7 +38,7 @@
       </div>
     </transition>
   </div>
-  <Profile @close-profile="isProfileOpen = false" />
+  <!-- <Profile @close-profile="isProfileOpen = false" /> -->
 </template>
 
 <script setup>

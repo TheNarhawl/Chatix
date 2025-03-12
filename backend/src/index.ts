@@ -422,7 +422,7 @@ app.get('/user/get-chats', async (req: Request, res: Response) => {
 });
 
 app.get('/chat/get-messages', async (req: Request, res: Response) => {
-  const { chatId }: GetChatMessages = req.body;
+  const { chatId }: GetChatMessages = req.query; 
 
   if (!chatId) {
     return res.status(400).json({ error: 'Требуется chatId' });

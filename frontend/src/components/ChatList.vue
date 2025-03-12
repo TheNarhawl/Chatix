@@ -24,9 +24,10 @@
             v-for="(dialog, index) in dialogs"
             :key="index"
             class="dialog-wrap"
+            @click="selectChat(dialog.id)"
           >
             <img :src="dialog.avatar" alt="Avatar" class="avatar" />
-            <span :class="['status', dialog.status]"></span>
+            <!-- <span :class="['status', dialog.status]"></span> -->
             <div class="dialog-info">
               <p class="nickname">{{ dialog.nickname }}</p>
               <p class="message-preview">{{ dialog.messagePreview }}</p>
@@ -44,7 +45,7 @@
             class="contact-wrap"
           >
             <img :src="contact.avatar" alt="Avatar" class="avatar" />
-            <span :class="['status', contact.status]"></span>
+            <!-- <span :class="['status', contact.status]"></span> -->
             <div class="contact-info">
               <p class="nickname">{{ contact.nickname }}</p>
               <p class="last-seen">{{ contact.lastSeen }}</p>
@@ -70,7 +71,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, defineEmits } from "vue";
 import { useAuthStore } from "@/store/authStore";
 
 const authStore = useAuthStore();
@@ -79,6 +80,14 @@ const dialogs = ref([]);
 const tabs = ["Recent", "Contacts", "Groups"];
 
 const userId = authStore.user?.id;
+
+const emit = defineEmits(['select-chat']);
+const selectChat = (chatId) => {
+  console.log(chatId);
+  emit('select-chat', chatId);
+}
+
+
 
 
 const fetchChats = async () => {

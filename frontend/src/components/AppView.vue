@@ -2,9 +2,12 @@
   <Navigation @toggle-chat-list="toggleChatList"></Navigation>
   <div class="dialogs-wrapper">
     <transition name="fade">
-      <ChatList v-if="isChatListVisible"></ChatList>
+      <ChatList
+        v-if="isChatListVisible"
+        @select-chat="handleChatSelect"
+      ></ChatList>
     </transition>
-    <Chat></Chat>
+    <Chat :chatId="selectedChatid"></Chat>
   </div>
 </template>
 
@@ -15,6 +18,11 @@ import ChatList from "./ChatList.vue";
 import Navigation from "./Navigation.vue";
 
 const isChatListVisible = ref(true);
+const selectedChatid = ref(null);
+
+const handleChatSelect = (chatId) => {
+  selectedChatid.value = chatId;
+};
 
 const toggleChatList = () => {
   isChatListVisible.value = !isChatListVisible.value;

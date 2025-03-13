@@ -54,12 +54,12 @@
         </ul>
       </div>
       <div class="input-area">
-        <input
-          type="text"
+        <textarea
           v-model="newMessage"
-          @keyup.enter="sendMessage"
-          placeholder="Введите сообщение..."
+          @keydown="handleKeydown"
+          placeholder="Write a message..."
           class="message-input"
+          :style="{ height: inputHeight }"
         />
         <button class="file-btn">
           <span><i class="bx bx-paperclip"></i></span>
@@ -118,6 +118,27 @@ const fetchChatData = async (chatId) => {
 };
 
 const newMessage = ref("");
+const inputHeight = ref("40px");
+
+const handleKeydown = (event) => {
+  if (event.key === "Enter" && event.shiftKey) {
+    return;
+  } else if (event.key === "Enter") {
+    event.preventDefault();
+    sendMessage();
+  }
+
+  adjustHeight(event.target);
+};
+
+const adjustHeight = (element) => {
+  const maxHeight = 120;
+  element.style.height = "auto";
+
+  const scrollHeight = element.scrollHeight;
+
+  inputHeight.value = Math.min(scrollHeight, maxHeight) + "px";
+};
 
 async function sendMessage() {
   if (!newMessage.value.trim()) {
@@ -142,6 +163,7 @@ async function sendMessage() {
     }
 
     newMessage.value = "";
+    inputHeight.value = "40px";
 
     fetchChatData(localChatId.value);
     await nextTick();
@@ -182,7 +204,8 @@ const formatTimestamp = (timestamp) => {
 .container {
   width: 100vw;
   height: calc(100vh - 60px);
-  background-color: white;
+  /* background-color: white; */
+  background-color: #110e21;
   display: flex;
   flex-direction: column;
 }
@@ -193,17 +216,17 @@ const formatTimestamp = (timestamp) => {
   justify-content: center;
   align-self: center;
   align-items: center;
-  background-color: white;
-  color: #d5d5d5;
+  background-color: #110e21;
+  color: grey;
 }
 
 .dialog {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   width: 100%;
-  background-color: #f0f0f0;
-  border-bottom: 1px solid #ccc;
+  height: 100%;
+  background-color: #1d1b34;
 }
 
 .user-info {
@@ -213,10 +236,11 @@ const formatTimestamp = (timestamp) => {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 20px 24px;
 }
 
 .user-wrapper {
+  color: white;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -245,20 +269,25 @@ const formatTimestamp = (timestamp) => {
 .actions {
   font-size: 20px;
   display: flex;
-  gap: 10px;
-  color: #666;
+  gap: 16px;
+  color: #969696;
 }
 
 .actions > span {
   cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.actions > span:hover {
+  color: #ff4c65;
 }
 
 .chat-window {
   width: 100%;
-  height: calc(100vh - 189px);
+  flex-grow: 1;
   padding: 10px;
   overflow-y: auto;
-  background-color: white;
+  background-color: #110e21;
   flex-direction: column;
 }
 
@@ -274,23 +303,23 @@ const formatTimestamp = (timestamp) => {
 }
 
 .message {
-  max-width: 70%;
+  max-width: 80%;
   display: flex;
   flex-direction: column;
 }
 
 .user-message {
   align-self: flex-end;
-  background-color: #3399ff;
-  color: white;
+  background-color: #29273f;
+  color: rgb(255, 255, 255);
   border-radius: 10px 10px 0 10px;
   padding: 10px;
 }
 
 .other-message {
   align-self: flex-start;
-  background-color: #e0f2ff;
-  color: black;
+  background-color: #1a1833;
+  color: rgb(255, 255, 255);
   border-radius: 10px 10px 10px 0;
   padding: 10px;
 }
@@ -299,6 +328,7 @@ const formatTimestamp = (timestamp) => {
   display: flex;
   align-items: center;
   margin-bottom: 5px;
+  gap: 10px;
 }
 
 .message-avatar {
@@ -317,11 +347,10 @@ const formatTimestamp = (timestamp) => {
   display: flex;
   flex-direction: column;
   margin-left: 40px;
-  gap: 5px;
 }
 
 .message-text {
-  max-width: 240px;
+  max-width: 300px;
   padding-right: 20px;
   margin: 0;
   font-size: 14px;
@@ -334,18 +363,20 @@ const formatTimestamp = (timestamp) => {
 
 .user-message > .message-content > .message-time {
   align-self: flex-end;
-  color: rgb(255, 255, 255);
+  color: rgb(100, 100, 100);
 }
 
 .input-area {
+  height: 160px;
   display: flex;
   padding: 10px;
   width: 100%;
-  background-color: #f0f0f0;
-  border-top: 1px solid #ccc;
+  background-color: #18172b;
+  border-top: 1px solid #1e1d23;
 }
 
 .message-input {
+  align-items: center;
   flex: 1;
   padding: 10px;
   border: none;
@@ -354,24 +385,64 @@ const formatTimestamp = (timestamp) => {
   background-color: transparent;
   outline: none;
   font-size: 16px;
+  resize: none;
+  overflow-y: auto;
+  max-height: 120px;
+  line-height: 1.5;
+  color: #d5d5d5;
 }
 
 .message-input::placeholder {
   color: #999;
 }
 
+.message-input::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}
+
 .emoji-btn,
 .file-btn {
   border: none;
-  cursor: pointer;
   margin-left: 5px;
   border: none;
   padding: 10px;
   font-size: 20px;
   color: #666;
+  background-color: #18172b;
+}
+
+.emoji-btn > span,
+.file-btn > span {
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.emoji-btn > span:hover,
+.file-btn > span:hover {
+  color: #ff4c65;
 }
 
 .file-btn > span > i {
   transform: rotate(-45deg);
+}
+
+.chat-window::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-window::-webkit-scrollbar-track {
+  background-color: none;
+  border-radius: 10px;
+}
+
+.chat-window::-webkit-scrollbar-thumb {
+  background-color: #1d1b34;
+  border-radius: 10px;
+  border: none;
+}
+
+.chat-window::-webkit-scrollbar-thumb:hover {
+  background-color: #27243d;
 }
 </style>

@@ -171,17 +171,19 @@ watch(
 
 <style scoped>
 .container {
-  z-index: 100;
+  z-index: 16;
   display: flex;
   flex-direction: column;
   height: calc(100vh - 60px);
   width: 340px;
-  background-color: #f5f5f5;
-  box-shadow: 0px 4px 4px rgb(0, 0, 0, 0.1);
+  /* background-color: #f5f5f5; */
+  background-color: #18172b;
+  box-shadow: 0 4px 6px rgb(0, 0, 0, 0.3);
 }
 
 .upper-buttons {
-  background-color: white;
+  /* background-color: white; */
+  background-color: #18172b;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -189,6 +191,7 @@ watch(
   width: 100%;
   height: 40px;
   padding: 0px 10px;
+
 }
 
 .btns-container {
@@ -200,7 +203,7 @@ watch(
 
 .btns-container > p {
   cursor: pointer;
-  color: black;
+  color: white;
   font-size: 14px;
   font-weight: 500;
   position: relative;
@@ -209,7 +212,7 @@ watch(
 }
 
 .btns-container > p.active {
-  color: #3399ff;
+  color: #e44081;
 }
 
 .btns-container > p.active::after {
@@ -219,13 +222,13 @@ watch(
   bottom: 0;
   width: 100%;
   height: 2px;
-  background-color: #3399ff;
+  background-color: #e44081;
 }
 
 .create-new-message-button {
   cursor: pointer;
   font-size: 20px;
-  color: #979797;
+  color: white;
 }
 
 .dialogs-container {
@@ -234,7 +237,8 @@ watch(
   min-height: 0;
   flex-grow: 1;
   overflow-y: auto;
-  background-color: #f5f5f5;
+  /* background-color: #f5f5f5; */
+  background-color: #18172b;
 }
 
 /* Стилизация ползунка для WebKit-браузеров (Chrome, Safari, Edge) */
@@ -243,18 +247,18 @@ watch(
 }
 
 .dialogs-container::-webkit-scrollbar-track {
-  background-color: #d3d3d3;
+  background-color: none;
   border-radius: 10px;
 }
 
 .dialogs-container::-webkit-scrollbar-thumb {
-  background-color: #b3d7f4;
+  background-color: #1d1b34;
   border-radius: 10px;
   border: none;
 }
 
 .dialogs-container::-webkit-scrollbar-thumb:hover {
-  background-color: #3399ff;
+  background-color: #27243d;
 }
 
 /* Для Firefox */
@@ -277,11 +281,11 @@ ul {
   align-items: center;
   gap: 10px;
   width: 100%;
-  background-color: white;
-  padding: 15px;
+  /* background-color: white; */
+  background-color: #18172b;
+  padding: 8px 10px;
   cursor: pointer;
   transition: background-color 0.2s;
-  border-bottom: 1px solid #ddd;
   position: relative;
 }
 
@@ -294,7 +298,7 @@ ul {
 .dialog-wrap:hover,
 .contact-wrap:hover,
 .group-wrap:hover {
-  background-color: #f0f0f0;
+  background-color: #413f5c;
 }
 
 .avatar-wrapper {
@@ -310,7 +314,7 @@ ul {
   object-fit: cover;
 }
 
-.status {
+/* .status {
   position: absolute;
   bottom: 16px;
   right: 220px;
@@ -318,15 +322,15 @@ ul {
   height: 12px;
   border-radius: 50%;
   border: 2px solid white;
-}
+} */
 
-.online {
+/* .online {
   background-color: #4caf50;
 }
 
 .offline {
   background-color: #ccc;
-}
+} */
 
 .dialog-info {
   display: flex;
@@ -335,6 +339,7 @@ ul {
 
 .nickname,
 .group-name {
+  color: white;
   font-weight: 600;
   font-size: 14px;
 }

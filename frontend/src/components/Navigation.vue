@@ -9,7 +9,10 @@
         <input
           type="text"
           class="search-input"
-          placeholder="Search contacts and messages..."
+          placeholder="Search users and messages..."
+          @focus="isSearchFocused = true"
+          @blur="onInputBlur"
+          v-model="searchQuery"
         />
       </div>
     </div>
@@ -39,13 +42,17 @@
     </transition>
   </div>
   <!-- <Profile @close-profile="isProfileOpen = false" /> -->
+  <transition name="search-transition">
+    <Search v-if="isSearchFocused || searchQuery" :query="searchQuery"/>
+  </transition>
 </template>
 
 <script setup>
 import Profile from "./Profile.vue";
+import Search from "./Search.vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/store/authStore";
-import { ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -54,6 +61,25 @@ const isProfileVisible = ref(false);
 
 const isAdditionalVisible = ref(false);
 const isProfileOpen = ref(false);
+const isSearchFocused = ref(false);
+const searchQuery = ref("");
+
+const handleContainerClick = (event) => {
+  const searchInput = event.target.closest('.search-container');
+  const searchComponent = event.target.closest('.search-wrapper');
+
+  if (!searchInput && !searchComponent) {
+    isSearchFocused.value = false;
+  }
+};
+
+const onInputBlur = () => {
+  setTimeout(() => {
+    if (!isSearchFocused.value) {
+      isSearchFocused.value = false;
+    }
+  }, 200);
+};
 
 let hideTimeout = null;
 
@@ -76,11 +102,19 @@ const logout = () => {
   authStore.logout();
   router.push("/login");
 };
+
+onMounted(() => {
+  document.addEventListener("click", handleContainerClick);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("click", handleContainerClick);
+});
 </script>
 
 <style>
 .container {
-  background-color: #2c3a57;
+  background-color: #18172b;
   z-index: 1;
   width: 100%;
   height: 60px;
@@ -103,14 +137,14 @@ const logout = () => {
 
 .left-container > span,
 .right-container > span {
-  color: #d1dbee;
-  transition: 0.1s ease;
+  color: #5b5875;
+  transition: 0.2s ease;
   cursor: pointer;
 }
 
 .left-container > span:hover,
 .right-container > span:hover {
-  color: rgb(170, 170, 170);
+  color: #c44075;
 }
 
 .right-container {
@@ -137,10 +171,10 @@ const logout = () => {
 
 .search-input {
   width: 100%;
-  padding: 5px 5px 5px 40px;
+  padding: 8px 8px 8px 40px;
   border: none;
   border-radius: 25px;
-  background-color: #424d67;
+  background-color: #27243d;
   color: white;
   appearance: none;
   outline: none;
@@ -221,5 +255,31 @@ const logout = () => {
 
 .dropdown-leave-to {
   opacity: 0;
+}
+
+.search-transition-enter-active,
+.search-transition-leave-active {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.search-transition-enter-from {
+  opacity: 0;
+}
+
+.search-transition-enter-to {
+  opacity: 1;
+}
+
+.search-transition-leave-from {
+  opacity: 1;
+}
+
+.search-transition-leave-to {
+  transform: translateY(8px);
+  opacity: 0;
+}
+
+.search {
+  position: absolute;
 }
 </style>

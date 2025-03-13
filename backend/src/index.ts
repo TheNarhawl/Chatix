@@ -22,6 +22,7 @@ import {
   EditMessageRequest,
   SendMessageRequest,
 } from './types/message';
+import { getRepository } from 'typeorm';
 
 config();
 
@@ -169,8 +170,6 @@ app.put('/user/update-bio', async (req: Request, res: Response) => {
 });
 
 app.get('/user/get-info', async (req: Request, res: Response) => {
-
-  console.log('Request Query:', req.query);
   const { userId } = req.query;
 
   console.log(userId);
@@ -422,7 +421,7 @@ app.get('/user/get-chats', async (req: Request, res: Response) => {
 });
 
 app.get('/chat/get-messages', async (req: Request, res: Response) => {
-  const { chatId }: GetChatMessages = req.query; 
+  const { chatId }: GetChatMessages = req.query;
 
   if (!chatId) {
     return res.status(400).json({ error: 'Требуется chatId' });
@@ -481,6 +480,36 @@ app.get('/chat/get-messages', async (req: Request, res: Response) => {
   } catch (err) {
     console.error('Ошибка при получении сообщений:', err);
     res.status(500).send('Error fetching messages');
+  }
+});
+
+app.get('/user/search', async (req: Request, res: Response) => {
+  const { prompt } = req.query;
+
+  if (!prompt) {
+    return res.status(400).json({ error: 'Промпт для поиска не указан' });
+  }
+
+  try {
+    const userRepository = AppDataSource.getRepository(User);
+
+    const users = await userRepository
+      .createQueryBuilder('user')
+      .where('user.username ILIKE :username', { username: `%${prompt}%` })
+      .select(['user.username', 'user.avatarURL'])
+      .getMany();
+
+    if (users.length > 0) {
+      return res.json({
+        message: 'ok',
+        data: users,
+      });
+    } else {
+      return res.status(404).json({ error: 'Пользователи не найдены' });
+    }
+  } catch (err) {
+    console.error('Ошибка при поиске пользователей', err);
+    res.status(500).json({ error: 'Ошибка сервера при поиске пользователей' });
   }
 });
 

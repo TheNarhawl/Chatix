@@ -6,7 +6,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "format": "prettier --write \"src//*.ts\" \"tests//*spec.ts\"",
-    "start:dev": "nodemon --watch \"src/\" --ext \"ts,json\" --ignore \"tests//*.spec.ts\" --exec \"ts-node src/index.ts\"",
+    "start:dev": "nodemon --watch \"src/\" --ext \"ts,json\" --ignore \"tests//*.spec.ts\" --exec \"ts-node src/main.ts\"",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
@@ -20,13 +20,16 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "http": "^0.0.1-security",
     "nodemon": "^3.1.9",
     "pg": "^8.13.3",
+    "socket.io": "^4.8.1",
     "typeorm": "^0.3.21",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.13.9",
+    "@types/socket.io": "^3.0.1",
     "prettier": "^3.5.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2"

@@ -1,9 +1,7 @@
 <template>
   <div class="container">
     <div class="left-container">
-      <span @click="emit('toggle-chat-list')"
-        ><i class="bx bx-dots-vertical"></i
-      ></span>
+      <span @click="emit('toggle-chat-list')"><i class="bx bx-menu"></i></span>
       <div class="search-container">
         <i class="bx bx-search search-icon"></i>
         <input
@@ -43,7 +41,7 @@
   </div>
   <!-- <Profile @close-profile="isProfileOpen = false" /> -->
   <transition name="search-transition">
-    <Search v-if="isSearchFocused || searchQuery" :query="searchQuery"/>
+    <Search v-if="isSearchFocused || searchQuery" :query="searchQuery" />
   </transition>
 </template>
 
@@ -65,8 +63,8 @@ const isSearchFocused = ref(false);
 const searchQuery = ref("");
 
 const handleContainerClick = (event) => {
-  const searchInput = event.target.closest('.search-container');
-  const searchComponent = event.target.closest('.search-wrapper');
+  const searchInput = event.target.closest(".search-container");
+  const searchComponent = event.target.closest(".search-wrapper");
 
   if (!searchInput && !searchComponent) {
     isSearchFocused.value = false;
@@ -144,7 +142,7 @@ onBeforeUnmount(() => {
 
 .left-container > span:hover,
 .right-container > span:hover {
-  color: #c44075;
+  color: #ff4c65;
 }
 
 .right-container {

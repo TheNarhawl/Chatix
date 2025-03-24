@@ -212,7 +212,7 @@ watch(
 }
 
 .btns-container > p.active {
-  color: #e44081;
+  color: #ff4c65;
 }
 
 .btns-container > p.active::after {
@@ -222,7 +222,7 @@ watch(
   bottom: 0;
   width: 100%;
   height: 2px;
-  background-color: #e44081;
+  background-color: #ff4c65;
 }
 
 .create-new-message-button {
